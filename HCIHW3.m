@@ -39,9 +39,11 @@ while word1 == 0
     [word,count] = mode(YBuffer);
     maxProb = max(probBuffer(labels == word,:));
     
-    if (word == "down" && word == "up")
+    if (word ~= "down" && word ~= "up")
+        
+    else 
         word
-        word1 = 1;       
+        word1 = 1;
     end
     
     drawnow
@@ -63,7 +65,9 @@ while word2 == 0
     word;
     maxProb = max(probBuffer(labels == word,:));
     
-    if (word == "left" && word == "right")
+    if (word ~= "left" && word ~= "right")
+
+    else
         word
         word2 = 1;
     end
@@ -114,4 +118,4 @@ end
 delete(SV); 
 clear SV TK;
 pause(0.2);
-end;
+end % TTS;
