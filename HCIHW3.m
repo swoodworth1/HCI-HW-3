@@ -3,6 +3,8 @@
 % HCI
 % Last Modified: 04/14/2021
 
+%Requires Deep Learning, Audio Acquisition, Image Acquisition Toolbox
+
 clear, clc
 load('commandNet.mat')
 
@@ -15,15 +17,15 @@ labels = trainedNet.Layers(end).Classes;
 YBuffer(1:classificationRate/2) = categorical("background");
 
 probBuffer = zeros([numel(labels),classificationRate/2]);
-tts('Specify face location');
 countThreshold = ceil(classificationRate*0.2);
 probThreshold = 0.7;
 
 word1 = 0;
 word2 = 0;
 
-while word1 == 0
+tts('Specify face location');
 
+while word1 == 0
     x = adr();
     write(audioBuffer,x);
     y = read(audioBuffer,fs,fs-adr.SamplesPerFrame);
@@ -37,11 +39,9 @@ while word1 == 0
     [word,count] = mode(YBuffer);
     maxProb = max(probBuffer(labels == word,:));
     
-    if (word ~= "down" && word ~= "up")
-        
-    else 
+    if (word == "down" && word == "up")
         word
-        word1 = 1;
+        word1 = 1;       
     end
     
     drawnow
@@ -63,9 +63,7 @@ while word2 == 0
     word;
     maxProb = max(probBuffer(labels == word,:));
     
-    if (word ~= "left" && word ~= "right")
-
-    else
+    if (word == "left" && word == "right")
         word
         word2 = 1;
     end
