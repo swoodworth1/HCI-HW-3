@@ -4,7 +4,10 @@
 % Last Modified: 04/14/2021
 
 %Requires Deep Learning, Audio Acquisition, Image Acquisition Toolbox,
-%Computer vision toolbox
+%Image Acquisition Toolbox Support Package for OS Generic Video Interface, Computer vision toolbox
+
+%Your current folder (to the left) must be under
+%MATLAB/Examples/deeplearning_shared/DeepLearningSpeechRecognitionExample
 
 clear, clc
 load('commandNet.mat')
@@ -212,14 +215,40 @@ while runLoop
         
         % Check if face in boundary
         if boundaryNum == 1 % top left
-            
+            if bboxPoints(1, 1) >= topLeft(1, 1) && bboxPoints(1, 2) >= topLeft(1, 2) ...
+                && bboxPoints(2, 1) <= topLeft(1, 3) && bboxPoints(2, 2) >= topLeft(1, 4) ...
+                && bboxPoints(3, 1) <= topLeft(1, 5) && bboxPoints(3, 2) <= topLeft(1, 6) ...
+                && bboxPoints(4, 1) >= topLeft(1, 7) && bboxPoints(4, 2) <= topLeft(1, 8)
+                disp('In top left')
+            else
+                disp('Out')
+            end
         elseif boundaryNum == 2 % top right
-            
+            if bboxPoints(1, 1) >= topRight(1, 1) && bboxPoints(1, 2) >= topRight(1, 2) ...
+                && bboxPoints(2, 1) <= topRight(1, 3) && bboxPoints(2, 2) >= topRight(1, 4) ...
+                && bboxPoints(3, 1) <= topRight(1, 5) && bboxPoints(3, 2) <= topRight(1, 6) ...
+                && bboxPoints(4, 1) >= topRight(1, 7) && bboxPoints(4, 2) <= topRight(1, 8)
+                disp('In top right')
+            else
+                disp('Out')
+            end
         elseif boundaryNum == 3 % bottom left
-            
+            if bboxPoints(1, 1) >= bottomLeft(1, 1) && bboxPoints(1, 2) >= bottomLeft(1, 2) ...
+                && bboxPoints(2, 1) <= bottomLeft(1, 3) && bboxPoints(2, 2) >= bottomLeft(1, 4) ...
+                && bboxPoints(3, 1) <= bottomLeft(1, 5) && bboxPoints(3, 2) <= bottomLeft(1, 6) ...
+                && bboxPoints(4, 1) >= bottomLeft(1, 7) && bboxPoints(4, 2) <= bottomLeft(1, 8)
+                disp('In bottom left')
+            else
+                disp('Out')
+            end
         elseif boundaryNum == 4 % bottom right
-            if bboxPoints(1, 1) >= bottomRight(1, 1) && bboxPoints(1, 2) >= bottomRight(1, 2)
-                disp('In') 
+            if bboxPoints(1, 1) >= bottomRight(1, 1) && bboxPoints(1, 2) >= bottomRight(1, 2) ... 
+                && bboxPoints(2, 1) <= bottomRight(1, 3) && bboxPoints(2, 2) >= bottomRight(1, 4) ...
+                && bboxPoints(3, 1) <= bottomRight(1, 5) && bboxPoints(3, 2) <= bottomRight(1, 6) ...
+                && bboxPoints(4, 1) >= bottomRight(1, 7) && bboxPoints(4, 2) <= bottomRight(1, 8)
+                disp('In bottom right') 
+            else
+                disp('Out')
             end
         end
             
