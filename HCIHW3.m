@@ -131,15 +131,13 @@ boundaryNum
 % w x h
 % 320 x 320
 
-while runLoop
+while runLoop || endLoop
 
     % Get the next frame.
     videoFrame = snapshot(cam);
     videoFrameGray = rgb2gray(videoFrame);
     frameCount = frameCount + 1;
 
-    %videoFrame = insertShape(videoFrame, 'Line', [320 0 320 640], 'LineWidth', 3, 'Color', 'green'); %vertical line
-    %videoFrame = insertShape(videoFrame, 'Line', [0 240 640 240], 'LineWidth', 3, 'Color', 'green'); %horizontal line
     videoFrame = insertShape(videoFrame, 'Polygon', topLeft, 'LineWidth', 3, 'Color', 'yellow'); %top left
     videoFrame = insertShape(videoFrame, 'Polygon', topRight, 'LineWidth', 3, 'Color', 'yellow'); %top right
     videoFrame = insertShape(videoFrame, 'Polygon', bottomLeft, 'LineWidth', 3, 'Color', 'yellow'); %bottom left
@@ -220,6 +218,8 @@ while runLoop
                 && bboxPoints(3, 1) <= topLeft(1, 5) && bboxPoints(3, 2) <= topLeft(1, 6) ...
                 && bboxPoints(4, 1) >= topLeft(1, 7) && bboxPoints(4, 2) <= topLeft(1, 8)
                 disp('In top left')
+                img = snapshot(cam);
+                endLoop = false;
             else
                 disp('Out')
             end
@@ -229,6 +229,8 @@ while runLoop
                 && bboxPoints(3, 1) <= topRight(1, 5) && bboxPoints(3, 2) <= topRight(1, 6) ...
                 && bboxPoints(4, 1) >= topRight(1, 7) && bboxPoints(4, 2) <= topRight(1, 8)
                 disp('In top right')
+                img = snapshot(cam);
+                endLoop = false;
             else
                 disp('Out')
             end
@@ -238,6 +240,8 @@ while runLoop
                 && bboxPoints(3, 1) <= bottomLeft(1, 5) && bboxPoints(3, 2) <= bottomLeft(1, 6) ...
                 && bboxPoints(4, 1) >= bottomLeft(1, 7) && bboxPoints(4, 2) <= bottomLeft(1, 8)
                 disp('In bottom left')
+                img = snapshot(cam);
+                endLoop = false;
             else
                 disp('Out')
             end
@@ -246,7 +250,9 @@ while runLoop
                 && bboxPoints(2, 1) <= bottomRight(1, 3) && bboxPoints(2, 2) >= bottomRight(1, 4) ...
                 && bboxPoints(3, 1) <= bottomRight(1, 5) && bboxPoints(3, 2) <= bottomRight(1, 6) ...
                 && bboxPoints(4, 1) >= bottomRight(1, 7) && bboxPoints(4, 2) <= bottomRight(1, 8)
-                disp('In bottom right') 
+                disp('In bottom right')
+                img = snapshot(cam);
+                endLoop = false;
             else
                 disp('Out')
             end
@@ -260,6 +266,8 @@ while runLoop
     % Check whether the video player window has been closed.
     runLoop = isOpen(videoPlayer);
 end
+
+image(img)
 
 % Clean up.
 clear cam;
