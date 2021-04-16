@@ -131,7 +131,8 @@ boundaryNum
 % w x h
 % 320 x 320
 
-while runLoop || endLoop
+tic
+while runLoop
 
     % Get the next frame.
     videoFrame = snapshot(cam);
@@ -211,51 +212,21 @@ while runLoop || endLoop
             setPoints(pointTracker, oldPoints);
         end
         
-        % Check if face in boundary
-        if boundaryNum == 1 % top left
-            if bboxPoints(1, 1) >= topLeft(1, 1) && bboxPoints(1, 2) >= topLeft(1, 2) ...
-                && bboxPoints(2, 1) <= topLeft(1, 3) && bboxPoints(2, 2) >= topLeft(1, 4) ...
-                && bboxPoints(3, 1) <= topLeft(1, 5) && bboxPoints(3, 2) <= topLeft(1, 6) ...
-                && bboxPoints(4, 1) >= topLeft(1, 7) && bboxPoints(4, 2) <= topLeft(1, 8)
-                disp('In top left')
-                img = snapshot(cam);
-                endLoop = false;
-            else
-                disp('Out')
+        if bboxPoints(1, 1) >= currentBoundary(1, 1) && bboxPoints(1, 2) >= currentBoundary(1, 2) ...
+            && bboxPoints(2, 1) <= currentBoundary(1, 3) && bboxPoints(2, 2) >= currentBoundary(1, 4) ...
+            && bboxPoints(3, 1) <= currentBoundary(1, 5) && bboxPoints(3, 2) <= currentBoundary(1, 6) ...
+            && bboxPoints(4, 1) >= currentBoundary(1, 7) && bboxPoints(4, 2) <= currentBoundary(1, 8)
+            disp('In boundary')
+            img = snapshot(cam);
+            runLoop = false;
+        else
+            if bboxPoints(1, 1) <= currentBoundary(1, 1) && bboxPoints(1, 2) >= currentBoundary(1, 2)
+                disp('Go to the right')
             end
-        elseif boundaryNum == 2 % top right
-            if bboxPoints(1, 1) >= topRight(1, 1) && bboxPoints(1, 2) >= topRight(1, 2) ...
-                && bboxPoints(2, 1) <= topRight(1, 3) && bboxPoints(2, 2) >= topRight(1, 4) ...
-                && bboxPoints(3, 1) <= topRight(1, 5) && bboxPoints(3, 2) <= topRight(1, 6) ...
-                && bboxPoints(4, 1) >= topRight(1, 7) && bboxPoints(4, 2) <= topRight(1, 8)
-                disp('In top right')
-                img = snapshot(cam);
-                endLoop = false;
-            else
-                disp('Out')
+            if bboxPoints(2, 1) >= currentBoundary(1, 3) && bboxPoints(2, 2) >= currentBoundary(1, 4)
+                disp('Go to the left')
             end
-        elseif boundaryNum == 3 % bottom left
-            if bboxPoints(1, 1) >= bottomLeft(1, 1) && bboxPoints(1, 2) >= bottomLeft(1, 2) ...
-                && bboxPoints(2, 1) <= bottomLeft(1, 3) && bboxPoints(2, 2) >= bottomLeft(1, 4) ...
-                && bboxPoints(3, 1) <= bottomLeft(1, 5) && bboxPoints(3, 2) <= bottomLeft(1, 6) ...
-                && bboxPoints(4, 1) >= bottomLeft(1, 7) && bboxPoints(4, 2) <= bottomLeft(1, 8)
-                disp('In bottom left')
-                img = snapshot(cam);
-                endLoop = false;
-            else
-                disp('Out')
-            end
-        elseif boundaryNum == 4 % bottom right
-            if bboxPoints(1, 1) >= bottomRight(1, 1) && bboxPoints(1, 2) >= bottomRight(1, 2) ... 
-                && bboxPoints(2, 1) <= bottomRight(1, 3) && bboxPoints(2, 2) >= bottomRight(1, 4) ...
-                && bboxPoints(3, 1) <= bottomRight(1, 5) && bboxPoints(3, 2) <= bottomRight(1, 6) ...
-                && bboxPoints(4, 1) >= bottomRight(1, 7) && bboxPoints(4, 2) <= bottomRight(1, 8)
-                disp('In bottom right')
-                img = snapshot(cam);
-                endLoop = false;
-            else
-                disp('Out')
-            end
+            disp('Out')
         end
             
     end
@@ -264,16 +235,16 @@ while runLoop || endLoop
     step(videoPlayer, videoFrame);
 
     % Check whether the video player window has been closed.
-    runLoop = isOpen(videoPlayer);
+    % runLoop = isOpen(videoPlayer);
 end
-
-image(img)
 
 % Clean up.
 clear cam;
 release(videoPlayer);
 release(pointTracker);
 release(faceDetector);
+
+image(img)
 
 function wav = tts(txt,voice,pace,fs)
 if ~ispc, error('Microsoft Win32 SAPI is required.'); end
@@ -314,7 +285,7 @@ if nargout > 0
     delete(MS);
     clear MS;
 end
-delete(SV); 
+delete(SV);
 clear SV TK;
 pause(0.2);
 end % TTS;
