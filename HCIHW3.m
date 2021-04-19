@@ -1,7 +1,7 @@
 % HW3
 % Created By: Ryan Bell & Sam Woodworth
 % HCI
-% Last Modified: 04/14/2021
+% Last Modified: 04/19/2021
 
 %Requires Deep Learning, Audio Acquisition, Image Acquisition Toolbox,
 %Image Acquisition Toolbox Support Package for OS Generic Video Interface, Computer vision toolbox
@@ -100,6 +100,8 @@ videoPlayer = vision.VideoPlayer('Position', [100 100 [frameSize(2), frameSize(1
 runLoop = true;
 numPts = 0;
 frameCount = 0;
+counter = 50;
+changeCounter = 0;
 
 topLeft = [2 2 320 2 320 240 2 240];
 topRight = [320 2 640 2 640 240 320 240];
@@ -110,22 +112,34 @@ if (wordOneSelected == "up")
    if (wordTwoSelected == "left")
        currentBoundary = topLeft;
        boundaryNum = 1;
+       ttsWordOne = 'up';
+       ttsWordTwo = 'left';
    else
        currentBoundary = topRight;
        boundaryNum = 2;
+       ttsWordOne = 'up';
+       ttsWordTwo = 'right';
    end
 else
    if (wordTwoSelected == "left")
        currentBoundary = bottomLeft;
        boundaryNum = 3;
+       ttsWordOne = 'down';
+       ttsWordTwo = 'left';
    else
        currentBoundary = bottomRight;
        boundaryNum = 4;
+       ttsWordOne = 'down';
+       ttsWordTwo = 'right';
    end
 end
     
 currentBoundary
 boundaryNum
+
+defaultStr = 'You chose the boundary';
+ttsChosen = append(defaultStr, ' ', ttsWordOne, ' ', ttsWordTwo);
+tts(ttsChosen);
 
 % 640 x 640
 % w x h
@@ -176,6 +190,19 @@ while runLoop
 
             % Display detected corners.
             videoFrame = insertMarker(videoFrame, xyPoints, '+', 'Color', 'white');
+        else
+           if(counter >= 100)
+                if changeCounter < 3
+                    tts('Move head left');
+                elseif changeCounter >= 3 && changeCounter < 7
+                    tts('Move head right');
+                else
+                    tts('Move head left');
+                    changeCounter = -1;
+                end
+                counter = 0;
+                changeCounter = changeCounter + 1;
+           end
         end
 
     else
@@ -216,20 +243,57 @@ while runLoop
             && bboxPoints(2, 1) <= currentBoundary(1, 3) && bboxPoints(2, 2) >= currentBoundary(1, 4) ...
             && bboxPoints(3, 1) <= currentBoundary(1, 5) && bboxPoints(3, 2) <= currentBoundary(1, 6) ...
             && bboxPoints(4, 1) >= currentBoundary(1, 7) && bboxPoints(4, 2) <= currentBoundary(1, 8)
-            disp('In boundary')
             img = snapshot(cam);
             runLoop = false;
+            tts('You are in view. Picture taken.');
         else
-            if bboxPoints(1, 1) <= currentBoundary(1, 1) && bboxPoints(1, 2) >= currentBoundary(1, 2)
-                disp('Go to the right')
+            output = 'ERROR';
+            switch boundaryNum
+                case 1 %Top left
+                    if bboxPoints(1, 2) >= currentBoundary(1, 6) || bboxPoints(2, 2) >= currentBoundary(1, 6) ...
+                            || bboxPoints(3, 2) >= currentBoundary(1, 6) || bboxPoints(4, 2) >= currentBoundary(1, 6)
+                       output = 'Move head up'; 
+                    elseif bboxPoints(1, 1) >= currentBoundary(1, 3) || bboxPoints(2, 1) >= currentBoundary(1, 3) ...
+                            || bboxPoints(3, 1) >= currentBoundary(1, 3) || bboxPoints(4, 1) >= currentBoundary(1, 3)
+                       output = 'Move head right'; 
+                    end
+                case 2 %Top right
+                    if bboxPoints(1, 2) >= currentBoundary(1, 6) || bboxPoints(2, 2) >= currentBoundary(1, 6) ...
+                            || bboxPoints(3, 2) >= currentBoundary(1, 6) || bboxPoints(4, 2) >= currentBoundary(1, 6)
+                       output = 'Move head up'; 
+                    elseif bboxPoints(1, 1) <= currentBoundary(1, 1) || bboxPoints(2, 1) <= currentBoundary(1, 1) ...
+                            || bboxPoints(3, 1) <= currentBoundary(1, 1) || bboxPoints(4, 1) <= currentBoundary(1, 1)
+                       output = 'Move head left';
+                    end
+                case 3 %Bottom left
+                    if bboxPoints(1, 2) <= currentBoundary(1, 4) || bboxPoints(2, 2) <= currentBoundary(1, 4) ...
+                            || bboxPoints(3, 2) <= currentBoundary(1, 4) || bboxPoints(4, 2) <= currentBoundary(1, 4)
+                       output = 'Move head down'; 
+                    elseif bboxPoints(1, 1) >= currentBoundary(1, 3) || bboxPoints(2, 1) >= currentBoundary(1, 3) ...
+                            || bboxPoints(3, 1) >= currentBoundary(1, 3) || bboxPoints(4, 1) >= currentBoundary(1, 3)
+                       output = 'Move head right'; 
+                    end
+                case 4 %Bottom right
+                    if bboxPoints(1, 2) <= currentBoundary(1, 4) || bboxPoints(2, 2) <= currentBoundary(1, 4) ...
+                            || bboxPoints(3, 2) <= currentBoundary(1, 4) || bboxPoints(4, 2) <= currentBoundary(1, 4)
+                       output = 'Move head down'; 
+                    elseif bboxPoints(1, 1) <= currentBoundary(1, 1) || bboxPoints(2, 1) <= currentBoundary(1, 1) ...
+                            || bboxPoints(3, 1) <= currentBoundary(1, 1) || bboxPoints(4, 1) <= currentBoundary(1, 1)
+                       output = 'Move head left'; 
+                    end
+                otherwise
+                    output = 'ERROR';
             end
-            if bboxPoints(2, 1) >= currentBoundary(1, 3) && bboxPoints(2, 2) >= currentBoundary(1, 4)
-                disp('Go to the left')
+            if(counter >= 100)
+                tts(output);
+                disp(output);
+                counter = 0;
             end
-            disp('Out')
         end
             
     end
+    
+    counter = counter + 1;
 
     % Display the annotated video frame using the video player object.
     step(videoPlayer, videoFrame);
